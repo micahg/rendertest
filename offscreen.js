@@ -13,6 +13,13 @@ function renderBox(x1, y1, x2, y2, style) {
   ctx.restore();
 }
 
+function animateSelection() {
+  if (!recording) return;
+  ctx.putImageData(baseData, 0, 0);
+  renderBox(startX, startY, endX, endY, 'rgba(255, 255, 255, 0.25)')
+  requestAnimationFrame(animateSelection);
+}
+
 self.onmessage = (evt) => {
   if (evt.data.cmd === 'init') {
     canvas = evt.data.canvas;
@@ -25,12 +32,11 @@ self.onmessage = (evt) => {
     startY = evt.data.values.y;
     recording = true;
     baseData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+    requestAnimationFrame(animateSelection);
   } else if (evt.data.cmd === 'mousemove') {
     if (!recording) return;
     endX = evt.data.values.x;
     endY = evt.data.values.y;
-    ctx.putImageData(baseData, 0, 0);
-    renderBox(startX, startY, endX, endY, 'rgba(255, 255, 255, 0.25)')
   } else if (evt.data.cmd === 'mouseup') {
     endX = evt.data.values.x;
     endY = evt.data.values.y;

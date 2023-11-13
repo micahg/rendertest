@@ -1,0 +1,27 @@
+<html>
+  <!-- <head>
+    <script type="text/javascript" src="render.js"></script>
+  </head> -->
+  <body style="margin:0px">
+  <!-- onload="onLoad()"> -->
+    <canvas id="overlay" style="width: 100vw; height: 100vh;"></canvas>
+    <script>
+      const canvas = document.getElementById("overlay");
+      const [w, h] = [canvas.offsetWidth, canvas.offsetHeight]
+      console.log(`${w}x${h}`);
+      const worker = new Worker("offscreen.js");
+      const offscreen = canvas.transferControlToOffscreen();
+      worker.postMessage({ cmd: 'init', canvas: offscreen, width: w, height: h}, [offscreen]);
+      const postEvent = (event) => {
+        const values = {
+          x: event.offsetX,
+          y: event.offsetY,
+        }
+        worker.postMessage({ cmd: event.type, values: values});
+      }
+      canvas.addEventListener('mousedown', postEvent);
+      canvas.addEventListener('mousemove', postEvent);
+      canvas.addEventListener('mouseup', postEvent);
+    </script>
+  </body>
+</html>
